@@ -73,44 +73,58 @@ async fn main() -> Result<(), Box<dyn Error>> {
     let mut other_peer_id: Option<PeerId> = None;
 
     loop {
-         select! {
-
-            Ok(Some(line)) = stdin.next_line() => {
-                if let Some(peer_id) = other_peer_id {
-                    swarm.behaviour_mut().request_response.send_request(
-                        &peer_id,
-                        FileRequest(line)
-                     );
-                }
+        select! {
+        Ok(Some(line)) = stdin.next_line() => {
+            if let Some(peer_id) = other_peer_id {
+                swarm.behaviour_mut().request_response.send_request(
+                    &peer_id,
+                    FileRequest(line)
+                );
             }
-            event = swarm.select_next_some() => match event {
-                SwarmEvent::NewListenAddr {
-                    address, ..
-                } => {
-                    println!("Listening on {address}");
-                }
-                SwarmEvent::ConnectionEstablished {peer_id, ..} =>{
-                    other_peer_id = Some(peer_id);
-                    println!("Established connection {:?}", peer_id);
-                }
-                SwarmEvent::Behaviour(ReqResBehaviourEvent::RequestResponse(
-                    request_response::Event::Message {
-                        message, 
-                        .. 
-                    }
-                )) => match message {
-                    request_response::Message::Request {request, channel, .. } => {
-                        println!("Request {:?}", request);
-                    }
-                    request_response::Message::Response { response, ..} => {
-                        println!("Response {:?}", response);
-                    }
-                }
-
-                _ => {},
-            }
-
         }
+        event = swarm.select_next_some() => match event {
+            SwarmEvent::NewListenAddr {
+                address, ..
+            } => {
+                println!("Listening on {address}");
+            }
+            SwarmEvent::ConnectionEstablished {peer_id, ..} =>{
+                other_peer_id = Some(peer_id);
+                println!("Established connection {:?}", peer_id);
+            }
+            SwarmEvent::Behaviour(ReqResBehaviourEvent::RequestResponse(
+                request_response::Event::Message {
+                    message,
+                    ..
+                }
+            )) => match message {
+                request_response::Message::Request {request, channel, .. } => {
+                    println!("Request {:?}", request);
+                    let filename = request.0;
+                    let file_bytes = match File::open(filename).await {
+                        Ok(mut file) => {
+                        let mut buffer = Vec::new();
+                        file.read_to_end(&mut buffer).await?;
+                        buffer
+
+                        }
+                        Err(_) => vec![]
+
+                    };
+                    let _ = swarm.behaviour_mut().request_response.send_response(
+                        channel,
+                        FileResponse(file_bytes)
+                    );
+                }
+                request_response::Message::Response { response, ..} => {
+                    println!("Response {:?}", response);
+                }
+            }
+
+                  _ => {},
+              }
+
+          }
     }
 
     Ok(())
