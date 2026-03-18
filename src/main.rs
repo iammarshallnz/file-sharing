@@ -68,5 +68,10 @@ async fn main() -> Result<(), Box<dyn Error>> {
         swarm.dial(peer)?;
     }
 
+    let mut stdin = BufReader::new(stdin()).lines();
+
+    
+
+
     Ok(())
 }
