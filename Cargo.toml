@@ -1,0 +1,13 @@
+[package]
+name = "file-sharing"
+version = "0.1.0"
+edition = "2024"
+
+[dependencies]
+async-trait = "0.1.89"
+clap = { version = "4.6.0", features = ["derive"] }
+futures = "0.3.32"
+serde = { version = "1.0.228", features = ["derive"] }
+tokio = { version = "1.50.0", features = ["full"] }
+libp2p = { version = "0.56", features = ["noise", "gossipsub", "mdns", "ping", "macros", "quic", "yamux", "tcp", "tokio", "cbor", "request-response"] }
+
