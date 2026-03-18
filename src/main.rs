@@ -93,14 +93,20 @@ async fn main() -> Result<(), Box<dyn Error>> {
                     other_peer_id = Some(peer_id);
                     println!("Established connection {:?}", peer_id);
                 }
-                // SwarmEvent::Behaviour(ReqResBehaviourEvent::RequestResponse(
-                //     request_response::Event::Message {
-                //         message, 
-                //         .. 
-                //     }
-                // )) => match message {
+                SwarmEvent::Behaviour(ReqResBehaviourEvent::RequestResponse(
+                    request_response::Event::Message {
+                        message, 
+                        .. 
+                    }
+                )) => match message {
+                    request_response::Message::Request {request, channel, .. } => {
+                        println!("Request {:?}", request);
+                    }
+                    request_response::Message::Response { response, ..} => {
+                        println!("Response {:?}", response);
+                    }
+                }
 
-                // }
                 _ => {},
             }
 
