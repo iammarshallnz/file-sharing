@@ -74,6 +74,15 @@ async fn main() -> Result<(), Box<dyn Error>> {
 
     loop {
          select! {
+
+            Ok(Some(line)) = stdin.next_line() => {
+                if let Some(peer_id) = other_peer_id {
+                    swarm.behaviour_mut().request_response.send_request(
+                        &peer_id,
+                        FileRequest(line)
+                     );
+                }
+            }
             event = swarm.select_next_some() => match event {
                 SwarmEvent::NewListenAddr {
                     address, ..
@@ -84,7 +93,14 @@ async fn main() -> Result<(), Box<dyn Error>> {
                     other_peer_id = Some(peer_id);
                     println!("Established connection {:?}", peer_id);
                 }
-                
+                // SwarmEvent::Behaviour(ReqResBehaviourEvent::RequestResponse(
+                //     request_response::Event::Message {
+                //         message, 
+                //         .. 
+                //     }
+                // )) => match message {
+
+                // }
                 _ => {},
             }
 
