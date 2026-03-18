@@ -1,7 +1,7 @@
 use clap::{Parser, error};
 use std::{error::Error, time::Duration};
 use libp2p::{
-    Multiaddr, PeerId, StreamProtocol, noise, request_response::{self,ProtocolSupport, cbor}, swarm::{NetworkBehaviour, SwarmEvent}, tcp, yamux
+    Multiaddr, PeerId, StreamProtocol, bytes::Bytes, noise, request_response::{self,ProtocolSupport, cbor}, swarm::{NetworkBehaviour, SwarmEvent}, tcp, yamux
 };
 use serde::{Deserialize, Serialize};
 use futures::StreamExt;
@@ -31,13 +31,19 @@ struct ReqResBehaviour{
     request_response: request_response::cbor::Behaviour<FileRequest, FileResponse>,
 }
 
+#[derive(Debug, Clone,PartialEq, Eq, Serialize,Deserialize)]
+pub struct FileRequest(String);
+
+#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+pub struct FileResponse(Vec<u8>);
 
 #[tokio::main]
 async fn main() -> Result<(), Box<dyn Error>> {
 
     let cli = Cli::parse();
-    println!("Hello, world!");
 
+
+    
     Ok(())
 
 }
