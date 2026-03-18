@@ -1,7 +1,7 @@
 use clap::{Parser, error};
 use std::{error::Error, time::Duration};
 use libp2p::{
-    Multiaddr, PeerId, StreamProtocol, bytes::Bytes, noise, request_response::{self,ProtocolSupport, cbor}, swarm::{NetworkBehaviour, SwarmEvent}, tcp, yamux
+    Multiaddr, PeerId, StreamProtocol, bytes::Bytes, noise, request_response::{self,ProtocolSupport, cbor}, swarm::{self, NetworkBehaviour, SwarmEvent}, tcp, yamux
 };
 use serde::{Deserialize, Serialize};
 use futures::StreamExt;
@@ -42,8 +42,25 @@ async fn main() -> Result<(), Box<dyn Error>> {
 
     let cli = Cli::parse();
 
+    let mut swarm = libp2p::SwarmBuilder::with_new_identity().with_tokio()
+        .with_tcp(tcp::Config::default(), 
+        noise::Config::new,
+        yamux::Config::default)?
+        .with_behaviour(|_key| ReqResBehaviour {
+                request_response: request_response::cbor::Behaviour::new(
+                     [(
+                        StreamProtocol::new("/file-exchange/1"),
+                        ProtocolSupport::Full,
+                    )],
+                    request_response::Config::default(),
+                    
+                    )
+            }
+        )?
+        .with_swarm_config(|cfg| 
+            cfg.with_idle_connection_timeout(Duration::from_secs(7200))
+        ).build();
 
-    
     Ok(())
 
 }
