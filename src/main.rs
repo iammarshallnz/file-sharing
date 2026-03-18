@@ -14,6 +14,19 @@ use tokio::{
     fs::File
 };
 
+#[derive(Parser)]
+#[clap(name = "libp2p request response example")]
+struct Cli {
+    #[arg(long)]
+    port: Option<String>,
+
+
+    #[arg(long)]
+    peer: Option<Multiaddr>,
+    
+}
+
+
 #[tokio::main]
 async fn main() -> Result<(), Box<dyn Error>> {
     println!("Hello, world!");
