@@ -70,8 +70,26 @@ async fn main() -> Result<(), Box<dyn Error>> {
 
     let mut stdin = BufReader::new(stdin()).lines();
 
-    
+    let mut other_peer_id: Option<PeerId> = None;
 
+    loop {
+         select! {
+            event = swarm.select_next_some() => match event {
+                SwarmEvent::NewListenAddr {
+                    address, ..
+                } => {
+                    println!("Listening on {address}");
+                }
+                SwarmEvent::ConnectionEstablished {peer_id, ..} =>{
+                    other_peer_id = Some(peer_id);
+                    println!("Established connection {:?}", peer_id);
+                }
+                
+                _ => {},
+            }
+
+        }
+    }
 
     Ok(())
 }
