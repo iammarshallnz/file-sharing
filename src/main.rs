@@ -1,10 +1,7 @@
 use clap::{Parser, error};
 use std::{error::Error, time::Duration};
 use libp2p::{
-    noise,
-    request_response::{self,ProtocolSupport},
-    swarm::{NetworkBehaviour, SwarmEvent},
-    tcp, yamux, Multiaddr,PeerId, StreamProtocol
+    Multiaddr, PeerId, StreamProtocol, noise, request_response::{self,ProtocolSupport, cbor}, swarm::{NetworkBehaviour, SwarmEvent}, tcp, yamux
 };
 use serde::{Deserialize, Serialize};
 use futures::StreamExt;
@@ -24,6 +21,14 @@ struct Cli {
     #[arg(long)]
     peer: Option<Multiaddr>,
 
+}
+
+
+
+
+#[derive(NetworkBehaviour)]
+struct ReqResBehaviour{
+    request_response: request_response::cbor::Behaviour<FileRequest, FileResponse>,
 }
 
 
