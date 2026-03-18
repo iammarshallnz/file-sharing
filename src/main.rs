@@ -23,12 +23,14 @@ struct Cli {
 
     #[arg(long)]
     peer: Option<Multiaddr>,
-    
+
 }
 
 
 #[tokio::main]
 async fn main() -> Result<(), Box<dyn Error>> {
+
+    let cli = Cli::parse();
     println!("Hello, world!");
 
     Ok(())
