@@ -61,6 +61,12 @@ async fn main() -> Result<(), Box<dyn Error>> {
         .build();
 
     let listen_port = cli.port.unwrap_or("0".to_string());
-    
+    let mutiaddr = format!("/ip4/0.0.0.0/tcp/{listen_port}");
+    swarm.listen_on(mutiaddr.parse()?)?;
+
+    if let Some(peer) = cli.peer {
+        swarm.dial(peer)?;
+    }
+
     Ok(())
 }
