@@ -1,4 +1,4 @@
-use clap::Parser;
+use clap::{Parser, error};
 use std::{error::Error, time::Duration};
 use libp2p::{
     noise,
@@ -14,7 +14,10 @@ use tokio::{
     fs::File
 };
 
-fn main() {
+#[tokio::main]
+async fn main() -> Result<(), Box<dyn Error>> {
     println!("Hello, world!");
-    
+
+    Ok(())
+
 }
